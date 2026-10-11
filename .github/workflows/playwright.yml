@@ -117,11 +117,11 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-      - name: Upload UI screenshots, traces and videos
+      - name: Upload UI debugging artifacts
         if: always() && inputs.suite != 'api'
         uses: actions/upload-artifact@v5
         with:
-          name: ${{ inputs.suite }}-test-output
+          name: ui-debugging-artifacts
           path: |
             test-results/
             docs/screenshots/checkout-success.png
@@ -162,9 +162,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Add Allure report to summary
-        run: |
-          echo "## Allure Test Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "[Open Allure Report](${{ steps.deployment.outputs.page_url }})" >> "$GITHUB_STEP_SUMMARY"
 
