@@ -3,7 +3,8 @@ import { expect, type Locator, type Page } from '@playwright/test';
 export abstract class BasePage {
     protected constructor(protected readonly page: Page) {}
 
-    abstract readonly path: string;
+    // pageAnchor - stable, unique element that confirms the page is loaded
+    protected abstract readonly path: string;
     protected abstract readonly pageAnchor: Locator;
 
     // Relative paths use the baseURL configured for the UI project.

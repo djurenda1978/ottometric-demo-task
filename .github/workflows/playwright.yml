@@ -67,6 +67,22 @@ jobs:
             *) echo "Unsupported suite: $SUITE"; exit 1 ;;
           esac
 
+      - name: Add Allure executor
+        if: always()
+        env:
+          SUITE: ${{ inputs.suite }}
+        run: |
+          if [ -d allure-results ]; then
+            cat > allure-results/executor.json <<EOF
+          {
+            "name": "GitHub Actions",
+            "type": "github",
+            "buildName": "${SUITE} - Run #${GITHUB_RUN_NUMBER}",
+            "buildUrl": "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          }
+          EOF
+          fi
+
       - name: Generate Allure single-file report
         if: always()
         run: |
