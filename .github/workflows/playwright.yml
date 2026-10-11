@@ -162,3 +162,9 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+      - name: Add Allure report to summary
+        run: |
+          echo "## Allure Test Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "[Open Allure Report](${{ steps.deployment.outputs.page_url }})" >> "$GITHUB_STEP_SUMMARY"
+
