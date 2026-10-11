@@ -24,6 +24,9 @@ jobs:
     env:
       CI: 'true'
 
+    outputs:
+      allure_generated: ${{ steps.allure.outputs.generated }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -84,11 +87,15 @@ jobs:
           fi
 
       - name: Generate Allure single-file report
+        id: allure
         if: always()
         run: |
-          if [ -d allure-results ] && [ -n "$(ls -A allure-results)" ]; then
+          if [ -d allure-results ] && [ -n "$(find allure-results -maxdepth 1 -name '*-result.json' -print -quit)" ]; then
             npx allure generate allure-results --clean --single-file -o allure-report
+            test -f allure-report/index.html
+            echo "generated=true" >> "$GITHUB_OUTPUT"
           else
+            echo "generated=false" >> "$GITHUB_OUTPUT"
             echo "No Allure results were generated."
           fi
 
@@ -120,3 +127,38 @@ jobs:
             docs/screenshots/checkout-success.png
           if-no-files-found: ignore
           retention-days: 30
+
+      - name: Configure GitHub Pages
+        if: always() && steps.allure.outputs.generated == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        if: always() && steps.allure.outputs.generated == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: allure-report/
+
+  deploy:
+    name: Deploy Allure Report
+    needs: test
+    if: always() && needs.test.outputs.allure_generated == 'true'
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
