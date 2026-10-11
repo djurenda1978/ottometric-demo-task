@@ -19,7 +19,7 @@ permissions:
 jobs:
   test:
     name: Playwright - ${{ inputs.suite }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       CI: 'true'
@@ -142,7 +142,7 @@ jobs:
     name: Publish Allure Report
     needs: test
     if: always() && needs.test.outputs.allure_generated == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     concurrency:
       group: github-pages
