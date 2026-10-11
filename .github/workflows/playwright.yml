@@ -139,7 +139,7 @@ jobs:
           path: allure-report/
 
   deploy:
-    name: Deploy Allure Report
+    name: Publish Allure Report
     needs: test
     if: always() && needs.test.outputs.allure_generated == 'true'
     runs-on: ubuntu-latest
